@@ -54,6 +54,10 @@ const (
 	PC_START = 0x3000
 )
 
+func memRead(address uint16) uint16 {
+	return memory[address]
+}
+
 func main() {
 	fmt.Println("Hello From VM")
 
@@ -66,5 +70,17 @@ func main() {
 	isRunning := true
 
 	for isRunning {
+		/* FETCH */
+		instr := memRead(registers[R_PC])
+		registers[R_PC]++
+		op := instr >> 12
+
+		switch op {
+		case OP_ADD:
+			break
+		default:
+			fmt.Print("invalid OP code")
+		}
 	}
+	fmt.Print(11 >> 1)
 }
