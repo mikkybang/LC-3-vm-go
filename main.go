@@ -84,3 +84,20 @@ func main() {
 	}
 	fmt.Print(11 >> 1)
 }
+
+func signExtend(x uint16, bitCount int) uint16 {
+	if (x>>(bitCount-1))&1 == 1 {
+		x |= 0xFFFF << bitCount
+	}
+	return x
+}
+
+func updateFlag(register uint16) {
+	if registers[register] == 0 {
+		registers[R_COND] = FL_ZRO
+	} else if registers[register]>>15 == 1 {
+		registers[R_COND] = FL_NEG
+	} else {
+		registers[R_COND] = FL_POS
+	}
+}
