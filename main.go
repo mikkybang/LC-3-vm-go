@@ -77,6 +77,17 @@ func main() {
 
 		switch op {
 		case OP_ADD:
+			r0 := (instr >> 9) & 0x7
+			r1 := (instr >> 6) & 0x7
+			isImmMode := bool((instr>>5)&0x1 == 1)
+			if isImmMode {
+				imm5 := signExtend(instr&0x1F, 5)
+				registers[r0] = registers[r1] + imm5
+			} else {
+				r2 := instr & 0x7
+				registers[r0] = registers[r1] + registers[r2]
+			}
+			updateFlag(registers[r0])
 			break
 		default:
 			fmt.Print("invalid OP code")
