@@ -89,11 +89,63 @@ func main() {
 			}
 			updateFlag(registers[r0])
 			break
+		case OP_AND:
+			r0 := (instr >> 9) & 0x7
+			r1 := (instr >> 6) & 0x7
+			isImmMode := bool((instr>>5)&0x1 == 1)
+			if isImmMode {
+				imm5 := signExtend(instr&0x1F, 5)
+				registers[r0] = registers[r1] & imm5
+			} else {
+				r2 := instr & 0x7
+				registers[r0] = registers[r1] & registers[r2]
+			}
+			break
+		case OP_NOT:
+			break
+		case OP_BR:
+			n := (instr >> 11) & 0x1
+			z := (instr >> 10) & 0x1
+			p := (instr >> 9) & 0x1
+			condRegister := registers[R_COND]
+			if (n&condRegister == FL_NEG) || (z&condRegister == FL_ZRO) || (p&condRegister == FL_POS) {
+				registers[R_PC] = registers[R_PC] + signExtend(instr&0x1FF, 9)
+			}
+			break
+		case OP_JMP:
+			bR := (instr >> 6) & 0x7
+			registers[R_PC] = bR
+			break
+		case OP_JSR:
+			registers[R_R7] = registers[R_PC]
+			isRegisterJump := bool((instr>>11)&0x1 == 1)
+			if isRegisterJump {
+				registers[R_PC] = registers[R_PC] + signExtend(instr&0x11FF, 11)
+			} else {
+				baseR := (instr >> 6) & 0x7
+				registers[R_PC] = baseR
+			}
+			break
+		case OP_LD:
+			break
 		case OP_LDI:
 			r0 := (instr >> 9) & 0x7
 			pcOffset := signExtend(instr&0x1FF, 9)
 			registers[r0] = memRead(memRead(registers[R_PC] + pcOffset))
 			updateFlag(r0)
+			break
+		case OP_LEA:
+			break
+		case OP_ST:
+			break
+		case OP_STI:
+			break
+		case OP_STR:
+			break
+		case OP_TRAP:
+			break
+		case OP_RES:
+		case OP_RTI:
 		default:
 			fmt.Print("invalid OP code")
 		}
