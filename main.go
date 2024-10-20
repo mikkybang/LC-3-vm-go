@@ -113,8 +113,8 @@ func main() {
 			}
 			break
 		case OP_JMP:
-			bR := (instr >> 6) & 0x7
-			registers[R_PC] = bR
+			baseR := (instr >> 6) & 0x7
+			registers[R_PC] = baseR
 			break
 		case OP_JSR:
 			registers[R_R7] = registers[R_PC]
@@ -127,12 +127,18 @@ func main() {
 			}
 			break
 		case OP_LD:
+			dr := (instr >> 9) & 0x7
+			pcOffset := signExtend(instr&0x1FF, 9)
+			registers[dr] = memRead(registers[R_PC] + pcOffset)
+			updateFlag(dr)
 			break
 		case OP_LDI:
 			r0 := (instr >> 9) & 0x7
 			pcOffset := signExtend(instr&0x1FF, 9)
 			registers[r0] = memRead(memRead(registers[R_PC] + pcOffset))
 			updateFlag(r0)
+			break
+		case OP_LDR:
 			break
 		case OP_LEA:
 			break
